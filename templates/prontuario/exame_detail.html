@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Exame · SisVet{% endblock %}
+
+{% block content %}
+<h1>{{ exame.nome }}</h1>
+<p class="muted">
+  {{ exame.get_tipo_display }} · Pet: <a href="{% url 'prontuario:pet_prontuario' exame.pet_id %}">{{ exame.pet.nome }}</a> ·
+  Coleta: {{ exame.data_coleta|date:"d/m/Y" }} ·
+  Registrado por {{ exame.veterinario.get_full_name|default:exame.veterinario.get_username }}
+  {% if exame.laboratorio %}· {{ exame.laboratorio }}{% endif %}
+</p>
+
+<div class="card">
+  <h2>Resultado</h2>
+  <p>{{ exame.resultado|linebreaksbr|default:"Sem resultado resumido." }}</p>
+  {% if exame.atendimento_id %}
+    <p class="muted">Atendimento relacionado: <a href="{% url 'prontuario:atendimento_detail' exame.atendimento_id %}">ver</a></p>
+  {% endif %}
+</div>
+
+<div class="card">
+  <div class="toolbar">
+    <h2>Arquivos anexados</h2>
+    <a class="btn" href="{% url 'prontuario:anexo_create' %}?exame={{ exame.pk }}">Anexar arquivo</a>
+  </div>
+  {% if anexos %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Arquivo</th>
+          <th class="hide-sm">Tamanho</th>
+          <th class="hide-sm">Enviado por</th>
+          <th>Em</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for anexo in anexos %}
+        <tr>
+          <td>{{ anexo.nome_original }}</td>
+          <td class="hide-sm">{{ anexo.tamanho_legivel }}</td>
+          <td class="hide-sm">{{ anexo.enviado_por.get_full_name|default:anexo.enviado_por.get_username }}</td>
+          <td>{{ anexo.criado_em|date:"d/m/Y H:i" }}</td>
+          <td>
+            <a href="{% url 'prontuario:anexo_download' anexo.pk %}?abrir=1" target="_blank" rel="noopener">Abrir</a> ·
+            <a href="{% url 'prontuario:anexo_download' anexo.pk %}">Baixar</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="muted">Nenhum arquivo anexado a este exame.</p>
+  {% endif %}
+</div>
+{% endblock %}

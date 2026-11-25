@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Anexar arquivo · SisVet{% endblock %}
+
+{% block content %}
+<h1>Anexar arquivo</h1>
+<p class="muted">
+  Pet: {{ pet.nome }}{% if exame %} · Exame: {{ exame.nome }}{% endif %}.
+  Aceitos: PDF, JPEG, PNG e WEBP, até 10 MB. Arquivos anexados não podem ser apagados.
+</p>
+
+<div class="card">
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <label>
+      {{ form.arquivo.label }}
+      {{ form.arquivo }}
+      {% if form.arquivo.errors %}<ul class="errorlist">{% for e in form.arquivo.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+    </label>
+    {% if exame %}<input type="hidden" name="exame_id" value="{{ exame.pk }}">{% endif %}
+    {% if not exame %}<input type="hidden" name="pet_id" value="{{ pet.pk }}">{% endif %}
+    <button class="btn" type="submit">Enviar arquivo</button>
+    <a class="btn btn-ghost" href="{% if exame %}{% url 'prontuario:exame_detail' exame.pk %}{% else %}{% url 'prontuario:pet_prontuario' pet.pk %}{% endif %}">Cancelar</a>
+  </form>
+</div>
+{% endblock %}

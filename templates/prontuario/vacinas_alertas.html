@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Vacinas · SisVet{% endblock %}
+
+{% block content %}
+<h1>Vacinas a vencer e em atraso</h1>
+<p class="muted">Mostra as próximas doses em até 30 dias e as que já estão atrasadas.</p>
+
+<div class="card">
+  <h2>Em atraso</h2>
+  {% if atrasadas %}
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Pet</th><th>Tutor</th><th>Vacina</th><th>Venceu em</th></tr></thead>
+      <tbody>
+        {% for v in atrasadas %}
+        <tr>
+          <td><a href="{% url 'prontuario:pet_prontuario' v.pet_id %}">{{ v.pet.nome }}</a></td>
+          <td>{{ v.pet.tutor.nome }}</td>
+          <td>{{ v.nome }}</td>
+          <td>{{ v.proxima_dose|date:"d/m/Y" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="muted">Nenhuma vacina em atraso.</p>
+  {% endif %}
+</div>
+
+<div class="card">
+  <h2>Próximas (30 dias)</h2>
+  {% if proximas %}
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Pet</th><th>Tutor</th><th>Vacina</th><th>Data</th></tr></thead>
+      <tbody>
+        {% for v in proximas %}
+        <tr>
+          <td><a href="{% url 'prontuario:pet_prontuario' v.pet_id %}">{{ v.pet.nome }}</a></td>
+          <td>{{ v.pet.tutor.nome }}</td>
+          <td>{{ v.nome }}</td>
+          <td>{{ v.proxima_dose|date:"d/m/Y" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="muted">Nenhuma dose prevista nos próximos 30 dias.</p>
+  {% endif %}
+</div>
+{% endblock %}

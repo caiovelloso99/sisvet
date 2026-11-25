@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Prontuário · {{ pet.nome }} · SisVet{% endblock %}
+
+{% block content %}
+<h1>Prontuário · {{ pet.nome }}</h1>
+<p class="muted">{{ pet.get_especie_display }}{% if pet.raca %} · {{ pet.raca }}{% endif %} · Tutor: <a href="{% url 'tutores:tutor_detail' pet.tutor_id %}">{{ pet.tutor.nome }}</a></p>
+
+<div class="toolbar">
+  <a class="btn" href="{% url 'prontuario:atendimento_create' %}?pet={{ pet.pk }}">Novo atendimento</a>
+  <a class="btn btn-ghost" href="{% url 'prontuario:vacina_create' %}?pet={{ pet.pk }}">Registrar vacina</a>
+  <a class="btn btn-ghost" href="{% url 'prontuario:exame_create' %}?pet={{ pet.pk }}">Registrar exame</a>
+</div>
+
+<div class="card">
+  <h2>Exames</h2>
+  {% if exames %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Exame</th>
+          <th>Coleta</th>
+          <th class="hide-sm">Tipo</th>
+          <th class="hide-sm">Laboratório</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for e in exames %}
+        <tr>
+          <td><a href="{% url 'prontuario:exame_detail' e.pk %}">{{ e.nome }}</a></td>
+          <td>{{ e.data_coleta|date:"d/m/Y" }}</td>
+          <td class="hide-sm">{{ e.get_tipo_display }}</td>
+          <td class="hide-sm">{{ e.laboratorio|default:"—" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="muted">Nenhum exame registrado.</p>
+  {% endif %}
+</div>
+
+<div class="card">
+  <h2>Atendimentos</h2>
+  {% if atendimentos %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Veterinário(a)</th>
+          <th>Diagnóstico</th>
+          <th>Situação</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in atendimentos %}
+        <tr>
+          <td><a href="{% url 'prontuario:atendimento_detail' a.pk %}">{{ a.data_hora|date:"d/m/Y H:i" }}</a></td>
+          <td>{{ a.veterinario.get_full_name|default:a.veterinario.get_username }}</td>
+          <td>{{ a.diagnostico|truncatechars:60|default:"—" }}</td>
+          <td>{% if a.assinado %}Assinado{% else %}Rascunho{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="muted">Nenhum atendimento registrado.</p>
+  {% endif %}
+</div>
+
+<div class="card">
+  <h2>Vacinas</h2>
+  {% if vacinas %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Vacina</th>
+          <th>Aplicação</th>
+          <th>Próxima dose</th>
+          <th class="hide-sm">Lote</th>
+          <th class="hide-sm">Veterinário(a)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for v in vacinas %}
+        <tr>
+          <td>{{ v.nome }}</td>
+          <td>{{ v.data_aplicacao|date:"d/m/Y" }}</td>
+          <td>{{ v.proxima_dose|date:"d/m/Y"|default:"—" }}</td>
+          <td class="hide-sm">{{ v.lote|default:"—" }}</td>
+          <td class="hide-sm">{{ v.veterinario.get_full_name|default:v.veterinario.get_username }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="muted">Nenhuma vacina registrada.</p>
+  {% endif %}
+</div>
+{% endblock %}

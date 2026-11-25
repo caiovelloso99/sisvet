@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Tutores · SisVet{% endblock %}
+
+{% block content %}
+<h1>Tutores</h1>
+
+<div class="toolbar">
+  <form method="get" style="display:flex; gap:8px; flex:1; min-width:240px; max-width:520px">
+    <input type="search" name="q" value="{{ q }}" placeholder="Buscar por nome, telefone, CPF ou e-mail">
+    <button class="btn btn-ghost" type="submit">Buscar</button>
+  </form>
+  <a class="btn" href="{% url 'tutores:tutor_create' %}">Novo tutor</a>
+</div>
+
+<div class="card">
+  {% if tutores %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Telefone</th>
+          <th class="hide-sm">E-mail</th>
+          <th class="hide-sm">Cadastrado em</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for tutor in tutores %}
+        <tr>
+          <td><a href="{% url 'tutores:tutor_detail' tutor.pk %}">{{ tutor.nome }}</a></td>
+          <td>{{ tutor.telefone|default:"—" }}</td>
+          <td class="hide-sm">{{ tutor.email|default:"—" }}</td>
+          <td class="hide-sm">{{ tutor.criado_em|date:"d/m/Y" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if is_paginated %}
+  <p class="muted">
+    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+    {% if page_obj.has_previous %} · <a href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}">Anterior</a>{% endif %}
+    {% if page_obj.has_next %} · <a href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}">Próxima</a>{% endif %}
+  </p>
+  {% endif %}
+  {% else %}
+  <p class="muted">
+    {% if q %}Nenhum tutor encontrado para "{{ q }}".{% else %}Nenhum tutor cadastrado ainda.{% endif %}
+  </p>
+  {% endif %}
+</div>
+{% endblock %}

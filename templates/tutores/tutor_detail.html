@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}{{ tutor.nome }} · SisVet{% endblock %}
+
+{% block content %}
+<div class="toolbar">
+  <h1>{{ tutor.nome }}</h1>
+  <a class="btn btn-ghost" href="{% url 'tutores:tutor_update' tutor.pk %}">Editar tutor</a>
+</div>
+
+<div class="card">
+  <h2>Dados do tutor</h2>
+  <table>
+    <tbody>
+      <tr><th>Telefone</th><td>{{ tutor.telefone|default:"—" }}</td></tr>
+      <tr><th>E-mail</th><td>{{ tutor.email|default:"—" }}</td></tr>
+      <tr><th>CPF</th><td>{{ tutor.cpf|default:"—" }}</td></tr>
+      <tr><th>Endereço</th><td>{{ tutor.endereco|default:"—" }}</td></tr>
+      <tr><th>Observações</th><td>{{ tutor.observacoes|linebreaksbr|default:"—" }}</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <div class="toolbar">
+    <h2>Pets</h2>
+    <a class="btn" href="{% url 'tutores:pet_create' %}?tutor={{ tutor.pk }}">Novo pet</a>
+  </div>
+  {% if pets %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Espécie</th>
+          <th class="hide-sm">Raça</th>
+          <th class="hide-sm">Sexo</th>
+          <th>Situação</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for pet in pets %}
+        <tr>
+          <td>{{ pet.nome }}</td>
+          <td>{{ pet.get_especie_display }}</td>
+          <td class="hide-sm">{{ pet.raca|default:"—" }}</td>
+          <td class="hide-sm">{{ pet.get_sexo_display }}</td>
+          <td>{% if pet.ativo %}Ativo{% else %}Inativo{% endif %}</td>
+          <td>
+            <a href="{% url 'tutores:pet_update' pet.pk %}">Editar</a>
+            {% if user.vinculo.papel == 'veterinario' or user.vinculo.papel == 'dono' %}
+              · <a href="{% url 'prontuario:pet_prontuario' pet.pk %}">Prontuário</a>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="muted">Este tutor ainda não tem pets cadastrados.</p>
+  {% endif %}
+</div>
+
+<p><a href="{% url 'tutores:tutor_list' %}">← Voltar para a lista de tutores</a></p>
+{% endblock %}

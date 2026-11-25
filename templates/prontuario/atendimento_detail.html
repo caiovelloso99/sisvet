@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Atendimento · SisVet{% endblock %}
+
+{% block content %}
+<h1>Atendimento · {{ atendimento.pet.nome }}</h1>
+<p class="muted">
+  {{ atendimento.data_hora|date:"d/m/Y H:i" }} ·
+  {{ atendimento.veterinario.get_full_name|default:atendimento.veterinario.get_username }} ·
+  Tutor: {{ atendimento.pet.tutor.nome }}
+</p>
+
+<div class="toolbar">
+  <a class="btn btn-ghost" href="{% url 'prontuario:pet_prontuario' atendimento.pet_id %}">← Prontuário do pet</a>
+  {% if atendimento.assinado %}
+    <span class="msg success" style="margin:0">Assinado em {{ atendimento.assinado_em|date:"d/m/Y H:i" }} por {{ atendimento.assinado_por.get_full_name|default:atendimento.assinado_por.get_username }}</span>
+  {% else %}
+    <span style="display:flex; gap:8px; flex-wrap:wrap">
+      <a class="btn btn-ghost" href="{% url 'prontuario:atendimento_update' atendimento.pk %}">Editar rascunho</a>
+      <form method="post" action="{% url 'prontuario:atendimento_assinar' atendimento.pk %}" style="margin:0"
+            onsubmit="return confirm('Assinar este atendimento? Depois de assinado, ele não poderá mais ser alterado.');">
+        {% csrf_token %}
+        <button class="btn" type="submit">Assinar atendimento</button>
+      </form>
+    </span>
+  {% endif %}
+</div>
+
+<div class="card">
+  <h2>Sinais vitais</h2>
+  <table>
+    <tbody>
+      <tr><th>Peso</th><td>{{ atendimento.peso_kg|default:"—" }}{% if atendimento.peso_kg %} kg{% endif %}</td></tr>
+      <tr><th>Temperatura</th><td>{{ atendimento.temperatura_c|default:"—" }}{% if atendimento.temperatura_c %} °C{% endif %}</td></tr>
+      <tr><th>Frequência cardíaca</th><td>{{ atendimento.frequencia_cardiaca|default:"—" }}{% if atendimento.frequencia_cardiaca %} bpm{% endif %}</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h2>Registro clínico</h2>
+  <table>
+    <tbody>
+      <tr><th>Queixa principal</th><td>{{ atendimento.queixa_principal|linebreaksbr|default:"—" }}</td></tr>
+      <tr><th>Anamnese</th><td>{{ atendimento.anamnese|linebreaksbr|default:"—" }}</td></tr>
+      <tr><th>Exame físico</th><td>{{ atendimento.exame_fisico|linebreaksbr|default:"—" }}</td></tr>
+      <tr><th>Diagnóstico</th><td>{{ atendimento.diagnostico|linebreaksbr|default:"—" }}</td></tr>
+      <tr><th>Conduta e prescrição</th><td>{{ atendimento.conduta|linebreaksbr|default:"—" }}</td></tr>
+    </tbody>
+  </table>
+</div>
+{% endblock %}

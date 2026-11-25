@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}{% if object %}Editar atendimento{% else %}Novo atendimento{% endif %} · SisVet{% endblock %}
+
+{% block content %}
+<h1>{% if object %}Editar atendimento{% else %}Novo atendimento{% endif %}</h1>
+<p class="muted">Salve como rascunho quantas vezes precisar. Ao assinar, o registro fica somente leitura.</p>
+
+<div class="card">
+  <form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="form-grid">
+      {% for field in form %}
+      <label>
+        {{ field.label }}
+        {{ field }}
+        {% if field.errors %}<ul class="errorlist">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      </label>
+      {% endfor %}
+    </div>
+    <button class="btn" type="submit">Salvar rascunho</button>
+    <a class="btn btn-ghost" href="{% if object %}{% url 'prontuario:atendimento_detail' object.pk %}{% else %}{% url 'agenda:dia' %}{% endif %}">Cancelar</a>
+  </form>
+</div>
+{% endblock %}

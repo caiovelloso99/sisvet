@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Registrar vacina · SisVet{% endblock %}
+
+{% block content %}
+<h1>Registrar vacina</h1>
+
+<div class="card">
+  <form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="form-grid">
+      {% for field in form %}
+      <label>
+        {{ field.label }}
+        {{ field }}
+        {% if field.errors %}<ul class="errorlist">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      </label>
+      {% endfor %}
+    </div>
+    <button class="btn" type="submit">Salvar</button>
+    <a class="btn btn-ghost" href="{% url 'prontuario:vacinas_alertas' %}">Cancelar</a>
+  </form>
+</div>
+{% endblock %}

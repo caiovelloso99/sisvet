@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% if user.is_authenticated %}
+  <h1>Início</h1>
+  <div class="card">
+    <h2>Bem-vindo(a), {{ user.get_username }}</h2>
+    <p class="muted">Use o menu acima para acessar os cadastros.</p>
+    <p><a class="btn" href="{% url 'tutores:tutor_list' %}">Ver tutores</a></p>
+    {% if user.vinculo.papel == 'veterinario' or user.vinculo.papel == 'dono' %}
+    <p><a class="btn btn-ghost" href="{% url 'prontuario:vacinas_alertas' %}">Vacinas a vencer e em atraso</a></p>
+    {% endif %}
+  </div>
+{% else %}
+  <div class="card">
+    <h2>Entrar no SisVet</h2>
+    <p><a class="btn" href="{% url 'login' %}">Fazer login</a></p>
+  </div>
+{% endif %}
+{% endblock %}

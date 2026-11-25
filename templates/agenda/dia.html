@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Agenda · SisVet{% endblock %}
+
+{% block content %}
+<h1>Agenda · {{ dia|date:"l, d/m/Y" }}</h1>
+
+<div class="toolbar">
+  <div style="display:flex; gap:8px; flex-wrap:wrap">
+    <a class="btn btn-ghost" href="?data={{ dia_anterior|date:'Y-m-d' }}">← Dia anterior</a>
+    <a class="btn btn-ghost" href="?data={{ hoje|date:'Y-m-d' }}">Hoje</a>
+    <a class="btn btn-ghost" href="?data={{ dia_seguinte|date:'Y-m-d' }}">Próximo dia →</a>
+  </div>
+  <a class="btn" href="{% url 'agenda:create' %}?data={{ dia|date:'Y-m-d' }}">Novo agendamento</a>
+</div>
+
+<div class="card">
+  {% if agendamentos %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Horário</th>
+          <th>Pet</th>
+          <th class="hide-sm">Tutor</th>
+          <th class="hide-sm">Veterinário(a)</th>
+          <th class="hide-sm">Motivo</th>
+          <th>Situação</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in agendamentos %}
+        <tr>
+          <td>{{ a.inicio|time:"H:i" }}–{{ a.fim|time:"H:i" }}</td>
+          <td><a href="{% url 'agenda:update' a.pk %}">{{ a.pet.nome }}</a><br><span class="muted">{{ a.pet.get_especie_display }}</span></td>
+          <td class="hide-sm">{{ a.pet.tutor.nome }}</td>
+          <td class="hide-sm">{{ a.veterinario.get_full_name|default:a.veterinario.get_username }}</td>
+          <td class="hide-sm">{{ a.motivo|default:"—" }}</td>
+          <td>
+            <form method="post" action="{% url 'agenda:status' a.pk %}" style="margin:0">
+              {% csrf_token %}
+              <select name="status" onchange="this.form.submit()">
+                {% for valor, rotulo in status_choices %}
+                <option value="{{ valor }}" {% if valor == a.status %}selected{% endif %}>{{ rotulo }}</option>
+                {% endfor %}
+              </select>
+            </form>
+          </td>
+          <td>
+            <a href="{% url 'agenda:update' a.pk %}">Editar</a>
+            {% if user.vinculo.papel == 'veterinario' or user.vinculo.papel == 'dono' %}
+              {% if a.atendimento %}
+                · <a href="{% url 'prontuario:atendimento_detail' a.atendimento.pk %}">Ver atendimento</a>
+              {% else %}
+                · <a href="{% url 'prontuario:atendimento_create' %}?agendamento={{ a.pk }}">Atender</a>
+              {% endif %}
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="muted">Nenhum agendamento para este dia.</p>
+  {% endif %}
+</div>
+{% endblock %}

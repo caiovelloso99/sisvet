@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Novo exame · SisVet{% endblock %}
+
+{% block content %}
+<h1>Registrar exame</h1>
+<p class="muted">Exames registrados não podem ser alterados nem apagados. Para corrigir, registre um novo exame.</p>
+
+<div class="card">
+  <form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="form-grid">
+      {% for field in form %}
+      <label>
+        {{ field.label }}
+        {{ field }}
+        {% if field.errors %}<ul class="errorlist">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      </label>
+      {% endfor %}
+    </div>
+    <button class="btn" type="submit">Registrar exame</button>
+    <a class="btn btn-ghost" href="{% url 'agenda:dia' %}">Cancelar</a>
+  </form>
+</div>
+{% endblock %}
